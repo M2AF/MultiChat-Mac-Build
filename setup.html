@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MultiChat — Setup</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg:       #0e0e10;
+    --surface:  #18181b;
+    --surface2: #1f1f23;
+    --border:   rgba(255,255,255,0.08);
+    --text:     #efeff1;
+    --muted:    #adadb8;
+    --twitch:   #9147ff;
+    --youtube:  #ff4444;
+    --kick:     #53fc18;
+    --abstract: #00ffa3;
+    --discord:  #7289da;
+    --accent:   #00ffa3;
+    --font:     'IBM Plex Sans', sans-serif;
+    --mono:     'IBM Plex Mono', monospace;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    overflow-x: hidden;
+  }
+
+  .container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 28px 24px 40px;
+  }
+
+  /* ── Header ── */
+  .app-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .app-logo {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 0.04em;
+  }
+
+  .app-logo span { color: var(--accent); }
+
+  .app-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+
+  /* ── Steps ── */
+  .steps {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .step {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--muted);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    transition: all 0.2s;
+    cursor: default;
+  }
+
+  .step:last-child { border-right: none; }
+
+  .step.active {
+    background: rgba(0,255,163,0.1);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .step.done {
+    background: rgba(0,255,163,0.05);
+    color: rgba(0,255,163,0.5);
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 12px;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .card-title .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-twitch   { background: var(--twitch); }
+  .dot-youtube  { background: var(--youtube); }
+  .dot-kick     { background: var(--kick); }
+  .dot-abstract { background: var(--abstract); }
+  .dot-discord  { background: var(--discord); }
+  .dot-general  { background: var(--accent); }
+
+  /* ── Fields ── */
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+
+  label {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 5px;
+    font-family: var(--mono);
+  }
+
+  label .req { color: var(--accent); margin-left: 2px; }
+  label .opt { color: rgba(173,173,184,0.4); margin-left: 4px; font-size: 10px; }
+
+  input[type="text"],
+  input[type="password"],
+  input[type="url"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 8px 11px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input:focus { border-color: rgba(0,255,163,0.4); }
+  input::placeholder { color: rgba(173,173,184,0.35); }
+  input.error { border-color: rgba(255,68,68,0.5); }
+
+  .hint {
+    font-size: 10px;
+    color: rgba(173,173,184,0.5);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  .hint a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  /* ── Toggle for optional sections ── */
+  .optional-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 9px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-left: auto;
+  }
+
+  .optional-toggle:hover {
+    color: var(--text);
+    border-color: rgba(255,255,255,0.2);
+  }
+
+  .optional-fields {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── Navigation ── */
+  .nav {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+  }
+
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; filter: none; }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover { color: var(--text); }
+
+  /* ── Error / Success ── */
+  .error-msg {
+    font-size: 11px;
+    color: #ff6b6b;
+    margin-top: 8px;
+    display: none;
+  }
+
+  /* ── Page switching ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── Done screen ── */
+  .done-icon {
+    text-align: center;
+    font-size: 48px;
+    margin: 20px 0 12px;
+  }
+
+  .done-title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .done-sub {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .platform-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+
+  .pill {
+    font-size: 11px;
+    font-family: var(--mono);
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid;
+  }
+
+  .pill-twitch   { color: var(--twitch);   border-color: rgba(145,71,255,0.3);  background: rgba(145,71,255,0.1); }
+  .pill-youtube  { color: var(--youtube);  border-color: rgba(255,68,68,0.3);   background: rgba(255,68,68,0.1); }
+  .pill-kick     { color: var(--kick);     border-color: rgba(83,252,24,0.3);   background: rgba(83,252,24,0.1); }
+  .pill-abstract { color: var(--abstract); border-color: rgba(0,255,163,0.3);   background: rgba(0,255,163,0.1); }
+  .pill-discord  { color: var(--discord);  border-color: rgba(114,137,218,0.3); background: rgba(114,137,218,0.1); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="app-header">
+    <div class="app-logo">Multi<span>Chat</span></div>
+    <div class="app-sub">Stream chat overlay · First-time setup</div>
+  </div>
+
+  <div class="steps" id="steps">
+    <div class="step active" id="step-1">1 · You</div>
+    <div class="step"        id="step-2">2 · Streams</div>
+    <div class="step"        id="step-3">3 · Discord</div>
+    <div class="step"        id="step-4">4 · Done</div>
+  </div>
+
+  <!-- ── Page 1: Branding ── -->
+  <div class="page active" id="page-1">
+    <div class="card">
+      <div class="card-title">
+        <span class="dot dot-general"></span>
+        Your Streamer Name
+      </div>
+      <div class="field">
+        <label for="brand-name">Display name <span class="req">*</span></label>
+        <input type="text" id="brand-name" placeholder="e.g. criptoejesus" maxlength="32">
+        <div class="hint">Shown in the top-left of the overlay and used when you send messages.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="dot dot-general"></span>
+        Streamer.bot Connection
+      </div>
+      <div class="field">
+        <label for="sb-url">WebSocket URL <span class="opt">(leave as-is if on same PC)</span></label>
+        <input type="text" id="sb-url" value="ws://127.0.0.1:8080/" placeholder="ws://127.0.0.1:8080/">
+        <div class="hint">Streamer.bot handles Twitch, YouTube, and Kick chat. Make sure it's running with WebSocket Server enabled on port 8080.</div>
+      </div>
+    </div>
+
+    <div id="error-1" class="error-msg">Please enter your streamer name.</div>
+    <div class="nav">
+      <button class="btn btn-primary" onclick="goTo(2)">Next →</button>
+    </div>
+  </div>
+
+  <!-- ── Page 2: Stream Links ── -->
+  <div class="page" id="page-2">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-twitch"></span>Twitch</div>
+      <div class="field">
+        <label for="twitch-url">Channel URL <span class="opt">optional</span></label>
+        <input type="url" id="twitch-url" placeholder="https://twitch.tv/username">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-youtube"></span>YouTube</div>
+      <div class="field">
+        <label for="youtube-url">Channel URL <span class="opt">optional</span></label>
+        <input type="url" id="youtube-url" placeholder="https://youtube.com/@handle">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-kick"></span>Kick</div>
+      <div class="field">
+        <label for="kick-url">Channel URL <span class="opt">optional</span></label>
+        <input type="url" id="kick-url" placeholder="https://kick.com/username">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-abstract"></span>Abstract</div>
+      <div class="field">
+        <label for="abstract-url">Stream URL <span class="opt">optional</span></label>
+        <input type="url" id="abstract-url" placeholder="https://portal.abs.xyz/stream/username">
+      </div>
+      <div class="field">
+        <label for="abs-username">AbsTools Username <span class="opt">optional</span></label>
+        <input type="text" id="abs-username" placeholder="e.g. criptoejesus" oninput="onAbsUsernameInput()">
+        <div class="hint">Your username on <a href="#" onclick="openExternal('https://abstools.top')">abstools.top</a> — the same one in your overlay URL.</div>
+      </div>
+
+      <div class="field">
+        <label for="abs-ws-url">
+          AbsTools Channel ID
+          <span class="opt">— auto-filled if you follow the steps below</span>
+        </label>
+        <input type="text" id="abs-ws-url" placeholder="wss://abstools.top/api/ws?channel_id=...">
+
+        <!-- Step by step guide -->
+        <div style="margin-top:10px; background:rgba(0,255,163,0.04); border:1px solid rgba(0,255,163,0.15); border-radius:6px; padding:12px;">
+          <div style="font-size:10px; font-weight:600; color:var(--abstract); font-family:var(--mono); margin-bottom:8px; letter-spacing:0.05em;">HOW TO FIND YOUR CHANNEL ID</div>
+          <div style="font-size:11px; color:var(--muted); line-height:1.9;">
+            <span style="color:var(--text)">1.</span> Go to
+            <a href="#" onclick="openExternal('https://abstools.top')" style="color:var(--abstract)">abstools.top</a>
+            and log in<br>
+            <span style="color:var(--text)">2.</span> Click <strong style="color:var(--text)">Chat Overlay</strong> in the left sidebar<br>
+            <span style="color:var(--text)">3.</span> Press <kbd style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:3px; padding:1px 5px; font-size:10px;">F12</kbd> to open browser DevTools<br>
+            <span style="color:var(--text)">4.</span> Click the <strong style="color:var(--text)">Network</strong> tab → filter by <strong style="color:var(--text)">WS</strong><br>
+            <span style="color:var(--text)">5.</span> Refresh the page — you'll see a connection starting with <code style="color:var(--abstract); font-size:10px;">ws2channel_id=</code><br>
+            <span style="color:var(--text)">6.</span> Click it → copy the full URL from the <strong style="color:var(--text)">Headers</strong> tab<br>
+            <span style="color:var(--text)">7.</span> Paste it in the box above
+          </div>
+          <div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(0,255,163,0.1);">
+            <div style="font-size:10px; color:var(--muted); margin-bottom:4px;">It will look like this:</div>
+            <code style="font-size:10px; color:rgba(0,255,163,0.7); word-break:break-all; line-height:1.6;">wss://abstools.top/api/ws?channel_id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-secondary" onclick="goTo(1)">← Back</button>
+      <button class="btn btn-primary"   onclick="goTo(3)">Next →</button>
+    </div>
+  </div>
+
+  <!-- ── Page 3: Discord ── -->
+  <div class="page" id="page-3">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-discord"></span>Discord Bot</div>
+
+      <div class="field">
+        <label for="discord-token">Bot Token <span class="opt">optional</span></label>
+        <input type="password" id="discord-token" placeholder="Paste your bot token here">
+        <div class="hint">
+          Get a free token at <a href="#" onclick="openExternal('https://discord.com/developers/applications')">discord.com/developers</a><br>
+          → New Application → Bot tab → Reset Token → Copy
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="discord-channel">Discord Channel ID <span class="opt">optional</span></label>
+        <input type="text" id="discord-channel" placeholder="e.g. 1217523827274158232">
+        <div class="hint">
+          In Discord: Settings → Advanced → enable Developer Mode.<br>
+          Then right-click your chat channel → Copy Channel ID.
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="discord-ws">Bridge URL <span class="opt">optional</span></label>
+        <input type="text" id="discord-ws" value="ws://127.0.0.1:8081/" placeholder="ws://127.0.0.1:8081/">
+        <div class="hint">
+          Local (default): <code style="color:var(--accent)">ws://127.0.0.1:8081/</code><br>
+          Hosted on Railway: <code style="color:var(--accent)">wss://your-app.up.railway.app/</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="background:rgba(114,137,218,0.06); border-color:rgba(114,137,218,0.2);">
+      <div style="font-size:11px; color:var(--muted); line-height:1.7;">
+        <strong style="color:var(--text)">Required bot permissions:</strong><br>
+        ✅ View Channels &nbsp; ✅ Read Message History<br><br>
+        <strong style="color:var(--text)">Required intent:</strong><br>
+        ✅ Message Content Intent
+        <span style="color:rgba(173,173,184,0.5)"> (Bot tab → Privileged Gateway Intents)</span>
+      </div>
+    </div>
+
+    <div id="error-3" class="error-msg"></div>
+    <div class="nav">
+      <button class="btn btn-secondary" onclick="goTo(2)">← Back</button>
+      <button class="btn btn-primary"   onclick="saveAndFinish()">Save & Launch →</button>
+    </div>
+  </div>
+
+  <!-- ── Page 4: Done ── -->
+  <div class="page" id="page-4">
+    <div class="done-icon">🎉</div>
+    <div class="done-title">You're all set!</div>
+    <div class="done-sub" id="done-sub">MultiChat is configured and ready to go.</div>
+    <div class="platform-pills" id="done-pills"></div>
+    <div class="nav">
+      <button class="btn btn-primary" id="launch-btn" onclick="launch()">Open MultiChat</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let currentPage = 1;
+
+  function goTo(n) {
+    // Validate page 1 before leaving
+    if (currentPage === 1 && n > 1) {
+      const name = document.getElementById('brand-name').value.trim();
+      if (!name) {
+        document.getElementById('brand-name').classList.add('error');
+        document.getElementById('error-1').style.display = 'block';
+        return;
+      }
+      document.getElementById('brand-name').classList.remove('error');
+      document.getElementById('error-1').style.display = 'none';
+    }
+
+    // Update step indicators
+    for (let i = 1; i <= 4; i++) {
+      const el = document.getElementById('step-' + i);
+      el.className = 'step' + (i === n ? ' active' : i < n ? ' done' : '');
+    }
+
+    document.getElementById('page-' + currentPage).classList.remove('active');
+    document.getElementById('page-' + n).classList.add('active');
+    currentPage = n;
+  }
+
+  function openExternal(url) {
+    if (window.__electronBridge) {
+      // Can't call shell directly — handled via link click in Electron
+    }
+    window.open(url);
+  }
+
+  async function saveAndFinish() {
+    const token   = document.getElementById('discord-token').value.trim();
+    const channel = document.getElementById('discord-channel').value.trim();
+
+    // If one Discord field is filled, both should be
+    if ((token && !channel) || (!token && channel)) {
+      const msg = document.getElementById('error-3');
+      msg.textContent = token
+        ? 'Please also enter your Discord Channel ID.'
+        : 'Please also enter your Discord Bot Token.';
+      msg.style.display = 'block';
+      return;
+    }
+    document.getElementById('error-3').style.display = 'none';
+
+    const settings = buildSettings();
+
+    if (window.__electronBridge) {
+      await window.__electronBridge.saveSettings(settings);
+    }
+
+    // Build done screen
+    buildDoneScreen(settings);
+    goTo(4);
+  }
+
+  function buildSettings() {
+    const get = (id) => document.getElementById(id).value.trim();
+    const channels = {};
+    if (get('twitch-url'))   channels.twitch   = get('twitch-url');
+    if (get('youtube-url'))  channels.youtube  = get('youtube-url');
+    if (get('kick-url'))     channels.kick     = get('kick-url');
+    if (get('abstract-url')) channels.abstract = get('abstract-url');
+
+    // Use WS URL directly, or fall back to empty
+    const absWsUrl  = get('abs-ws-url')  || '';
+    const absUsername = get('abs-username') || '';
+
+    return {
+      BRAND_NAME:         get('brand-name') || 'MultiChat',
+      SB_WS_URL:          get('sb-url')     || 'ws://127.0.0.1:8080/',
+      ABS_WS_URL:         absWsUrl,
+      ABS_USERNAME:       absUsername,
+      DISCORD_WS_URL:     get('discord-ws') || 'ws://127.0.0.1:8081/',
+      DISCORD_BOT_TOKEN:  get('discord-token')  || '',
+      DISCORD_CHANNEL_ID: get('discord-channel') || '',
+      CHANNELS:           channels,
+      DEFAULTS: { bgColor: { r:14, g:14, b:16 }, bgAlpha: 1, fontScale: 1 },
+      _setupDone: true
+    };
+  }
+
+  function buildDoneScreen(s) {
+    document.getElementById('done-sub').textContent =
+      `Welcome, ${s.BRAND_NAME}! Your platforms are configured and ready.`;
+
+    const pills = document.getElementById('done-pills');
+    pills.innerHTML = '';
+    const active = [];
+    if (s.CHANNELS?.twitch)   active.push(['twitch',   'Twitch']);
+    if (s.CHANNELS?.youtube)  active.push(['youtube',  'YouTube']);
+    if (s.CHANNELS?.kick)     active.push(['kick',     'Kick']);
+    if (s.CHANNELS?.abstract) active.push(['abstract', 'Abstract']);
+    if (s.DISCORD_BOT_TOKEN)  active.push(['discord',  'Discord']);
+    if (!active.length) active.push(['general', 'Streamer.bot']);
+
+    active.forEach(([cls, label]) => {
+      const p = document.createElement('span');
+      p.className = 'pill pill-' + cls;
+      p.textContent = '✓ ' + label;
+      pills.appendChild(p);
+    });
+  }
+
+  function launch() {
+    if (window.__electronBridge) {
+      window.__electronBridge.openMainApp();
+    }
+  }
+
+  // ── Pre-fill if re-opening settings ──────────────────────────────────────────
+  // Auto-fill username from abstract URL if pasted into ws field by mistake
+  function onAbsUsernameInput() {
+    // nothing needed — username is just for display reference
+  }
+
+  document.getElementById('abs-ws-url').addEventListener('blur', function() {
+    const val = this.value.trim();
+    if (!val) return;
+
+    // If they pasted an overlay/page URL instead of the WS URL, clear and guide them
+    if (val.startsWith('http') && !val.startsWith('wss://') && !val.startsWith('ws://')) {
+      this.value = '';
+      this.style.borderColor = 'rgba(255,100,100,0.5)';
+      this.placeholder = '⚠️ Paste the wss:// URL from the Network tab, not a page URL';
+      setTimeout(() => {
+        this.style.borderColor = '';
+        this.placeholder = 'wss://abstools.top/api/ws?channel_id=...';
+      }, 4000);
+      return;
+    }
+
+    // Valid WS URL — highlight green
+    if (val.includes('abstools.top/api/ws')) {
+      this.style.borderColor = 'rgba(0,255,163,0.4)';
+    }
+  });
+
+  async function prefill() {
+    if (!window.__electronBridge) return;
+    const s = await window.__electronBridge.getSettings();
+    if (!s) return;
+
+    const set = (id, val) => { if (val) document.getElementById(id).value = val; };
+    set('brand-name',      s.BRAND_NAME);
+    set('sb-url',          s.SB_WS_URL);
+    set('abs-ws-url',      s.ABS_WS_URL);
+    set('abs-username',    s.ABS_USERNAME || '');
+    set('twitch-url',      s.CHANNELS?.twitch);
+    set('youtube-url',     s.CHANNELS?.youtube);
+    set('kick-url',        s.CHANNELS?.kick);
+    set('abstract-url',    s.CHANNELS?.abstract);
+    set('discord-token',   s.DISCORD_BOT_TOKEN);
+    set('discord-channel', s.DISCORD_CHANNEL_ID);
+    set('discord-ws',      s.DISCORD_WS_URL);
+
+    // If re-opening settings, change button text
+    if (s._setupDone) {
+      document.getElementById('launch-btn').textContent = 'Save & Relaunch';
+    }
+  }
+
+  prefill();
+</script>
+</body>
+</html>

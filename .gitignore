@@ -1,0 +1,15 @@
+# ⚠️  config.js contains your secret bot token — NEVER commit it
+config.js
+.env
+
+# Node
+node_modules/
+package-lock.json
+
+# Electron build output
+dist/
+
+# OS junk
+.DS_Store
+Thumbs.db
+*.log
