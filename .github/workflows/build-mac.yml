@@ -1,11 +1,6 @@
 name: Build macOS
 
 on:
-  # Runs when you push a tag like v1.0.0
-  push:
-    tags:
-      - 'v*'
-  # OR trigger it manually from the GitHub Actions tab
   workflow_dispatch:
 
 jobs:
@@ -27,7 +22,6 @@ jobs:
       - name: Build macOS app (unsigned)
         run: npm run build:mac
         env:
-          # Skips code signing — app will work but show a security warning on first open
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Upload .dmg artifact
@@ -36,10 +30,3 @@ jobs:
           name: MultiChat-macOS
           path: dist/*.dmg
           retention-days: 30
-
-      # If triggered by a tag, also attach it to a GitHub Release automatically
-      - name: Upload to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/*.dmg
