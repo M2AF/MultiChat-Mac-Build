@@ -1,82 +1,48 @@
 {
   "name": "multichat",
   "version": "1.0.0",
-  "description": "Multi-platform stream chat overlay \u2014 Twitch, YouTube, Kick, Abstract, Discord",
+  "description": "Multi-platform stream chat overlay — Twitch, YouTube, Kick, Abstract, Discord",
   "main": "electron-main.js",
+  "author": "criptoejesus",
+  "license": "MIT",
   "scripts": {
-    "start": "electron .",
-    "bridge": "node discord-bridge.js",
-    "build": "electron-builder --win --x64",
-    "build:mac": "electron-builder --mac --universal",
+    "start":       "electron .",
+    "build":       "electron-builder --win",
+    "build:mac":   "electron-builder --mac",
     "build:linux": "electron-builder --linux"
   },
-  "dependencies": {
-    "ws": "^8.17.0"
-  },
   "devDependencies": {
-    "electron": "^29.0.0",
+    "electron":         "^29.0.0",
     "electron-builder": "^24.0.0"
   },
   "build": {
-    "appId": "com.multichat.overlay",
+    "appId":       "com.criptoejesus.multichat",
     "productName": "MultiChat",
-    "directories": {
-      "output": "dist"
-    },
     "files": [
-      "electron-main.js",
-      "preload.js",
       "multichat.html",
       "setup.html",
-      "discord-bridge.js",
-      "assets/**/*",
-      "node_modules/**/*"
+      "electron-main.js",
+      "preload.js",
+      "assets/**/*"
     ],
     "win": {
       "target": "nsis",
-      "icon": "assets/icon.ico"
+      "icon":   "assets/icon.ico"
     },
     "nsis": {
-      "oneClick": false,
+      "oneClick":         false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true
     },
     "mac": {
-      "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "universal"
-          ]
-        }
-      ],
-      "icon": "assets/icon.icns",
+      "target": "dmg",
+      "icon":   "assets/icon.icns",
       "category": "public.app-category.utilities"
     },
     "linux": {
       "target": "AppImage",
-      "icon": "assets/icon.png"
-    },
-    "dmg": {
-      "title": "MultiChat",
-      "icon": "assets/icon.icns",
-      "contents": [
-        {
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ],
-      "window": {
-        "width": 540,
-        "height": 380
-      }
+      "icon":   "assets/icon.png"
     }
   }
 }
