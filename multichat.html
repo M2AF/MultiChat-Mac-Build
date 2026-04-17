@@ -807,26 +807,58 @@ function connectYouTube() {
 /* ════════════════════════════════════════════════════════════════════════════
    ABSTRACT CHAT  — direct WebSocket
 ════════════════════════════════════════════════════════════════════════════ */
+// Abstract connection guards
+let absGeneration    = 0;   // incremented on every new connection attempt
+let absHistoryLoaded = false; // only show chat_history once
+let absBackoff       = 5000;  // retry delay, doubles on each failure (max 30s)
+const ABS_SEEN       = new Set(); // persists across reconnects
+
 function connectAbstract() {
   const url=(CONFIG.ABS_WS_URL||'').trim();
   if(!url)return;
+
+  // Stamp this connection attempt; any callback from an older attempt will be ignored
+  const myGen = ++absGeneration;
+
   setStatus('abstract','connecting');
-  const ABS_SEEN=new Set();
   const ws=new WebSocket(url);
-  ws.onopen=()=>setStatus('abstract','connected');
+
+  ws.onopen=()=>{
+    if(myGen!==absGeneration)return; // stale — a newer connection already started
+    absBackoff=5000; // reset backoff on success
+    setStatus('abstract','connected');
+  };
+
   ws.onmessage=(event)=>{
+    if(myGen!==absGeneration)return; // stale socket — drop silently
     try{
       const data=JSON.parse(event.data);
       if(data.type==='chat_history'&&data.payload?.messages){
-        data.payload.messages.forEach(m=>{if(!ABS_SEEN.has(m.id)){ABS_SEEN.add(m.id);addMessage('abstract',m.user_name||'anon',m.text||'','');}});
+        // Only show history on the very first connect — not on every reconnect
+        if(!absHistoryLoaded){
+          absHistoryLoaded=true;
+          data.payload.messages.forEach(m=>{if(!ABS_SEEN.has(m.id)){ABS_SEEN.add(m.id);addMessage('abstract',m.user_name||'anon',m.text||'','');}});
+        }
       }
       if(data.type==='chat_message'&&data.payload){
         const m=data.payload;if(!ABS_SEEN.has(m.id)){ABS_SEEN.add(m.id);addMessage('abstract',m.user_name||'anon',m.text||'','');}
       }
     }catch(e){}
   };
-  ws.onclose=()=>{setStatus('abstract','error');setTimeout(connectAbstract,5000);};
-  ws.onerror=()=>setStatus('abstract','error');
+
+  ws.onclose=()=>{
+    if(myGen!==absGeneration)return; // stale — ignore
+    setStatus('abstract','error');
+    const delay=absBackoff;
+    absBackoff=Math.min(absBackoff*2,30000); // exponential backoff, cap at 30s
+    setTimeout(connectAbstract,delay);
+  };
+
+  ws.onerror=()=>{
+    if(myGen!==absGeneration)return;
+    setStatus('abstract','error');
+    // onclose will also fire after onerror, so no need to reconnect here
+  };
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
