@@ -862,19 +862,51 @@ function connectAbstract() {
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
-   DISCORD BRIDGE  — discord-bridge.js local or Railway
+   DISCORD BRIDGE — Processes BOTH Discord and YouTube from the bridge
 ════════════════════════════════════════════════════════════════════════════ */
 function connectDiscord() {
-  const url=(CONFIG.DISCORD_WS_URL||'').trim();
-  if(!url)return;
-  setStatus('discord','connecting');
-  const ws=new WebSocket(url);
-  ws.onopen=()=>{setStatus('discord','connected');console.log('[Discord] bridge connected');};
-  ws.onmessage=(event)=>{
-    try{const d=JSON.parse(event.data);if(d.platform==='discord'&&d.username&&d.text)addMessage('discord',d.username,d.text,'');}catch(e){}
+  const url = (CONFIG.DISCORD_WS_URL || '').trim();
+  if (!url) return;
+
+  setStatus('discord', 'connecting');
+  const ws = new WebSocket(url);
+
+  ws.onopen = () => {
+    setStatus('discord', 'connected');
+    console.log('[Bridge] Connection established');
   };
-  ws.onclose=()=>{setStatus('discord','error');setTimeout(connectDiscord,5000);};
-  ws.onerror=()=>{};
+
+  ws.onmessage = (event) => {
+    try {
+      const d = JSON.parse(event.data);
+      
+      // FIX: Listen for both 'discord' AND 'youtube' platforms from the bridge
+      if ((d.platform === 'discord' || d.platform === 'youtube') && d.username && d.text) {
+        
+        // Add message to the UI
+        addMessage(d.platform, d.username, d.text, '');
+
+        // If it's a YouTube message coming through the bridge, 
+        // ensure the YouTube status icon turns green
+        if (d.platform === 'youtube') {
+          setStatus('youtube', 'connected');
+        }
+      }
+    } catch (e) {
+      console.error('[Bridge] Error parsing message:', e);
+    }
+  };
+
+  ws.onclose = () => {
+    setStatus('discord', 'error');
+    // If bridge dies, YouTube status should also reflect that it's disconnected
+    setStatus('youtube', 'error'); 
+    setTimeout(connectDiscord, 5000);
+  };
+
+  ws.onerror = () => {
+    console.error('[Bridge] WebSocket error occurred');
+  };
 }
 
 /* ─── UI TOGGLE ─────────────────────────────────────────────────────────── */
